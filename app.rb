@@ -15,14 +15,9 @@ class App < Sinatra::Application
 
   get "/" do
     user = current_user
-
-
-
     if current_user
-      # users = User.find(:id != :user_id)
-
-      users = @database_connection.sql("SELECT * FROM users WHERE id != #{user["id"]}")
-      fish = @database_connection.sql("SELECT * FROM fish WHERE user_id = #{current_user["id"]}")
+      users = User.where("id != ?", user[:id])
+      fish = Fish.where(user_id: user[:id])
       erb :signed_in, locals: {current_user: user, users: users, fish_list: fish}
     else
       erb :signed_out
@@ -64,6 +59,7 @@ class App < Sinatra::Application
 
   delete "/users/:id" do
     User.delete(params[:id])
+
     redirect "/"
   end
 
@@ -156,18 +152,13 @@ class App < Sinatra::Application
   end
 
   def username_available?(username)
-        
-    existing_users = User.where("username = ?", "#{username}")
-    existing_users.length == 0
+
+    existing_users = User.find_by(username: username)
+    existing_users ? false : true
   end
 
   def authenticate_user
-    select_sql = <<-SQL
-    SELECT * FROM users
-    WHERE username = '#{params[:username]}' AND password = '#{params[:password]}'
-    SQL
-
-    @database_connection.sql(select_sql).first
+    User.find_by(username: params[:username],  password: params[:password])
   end
 
   def current_user
