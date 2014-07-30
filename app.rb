@@ -34,13 +34,7 @@ class App < Sinatra::Application
 
   post "/registrations" do
     if validate_registration_params
-      insert_sql = <<-SQL
-      INSERT INTO users (username, password)
-      VALUES ('#{params[:username]}', '#{params[:password]}')
-      SQL
-
-      @database_connection.sql(insert_sql)
-
+      User.create(:username => (params[:username]), :password => (params[:password]))
       flash[:notice] = "Thanks for registering"
       redirect "/"
     else
@@ -68,11 +62,7 @@ class App < Sinatra::Application
   end
 
   delete "/users/:id" do
-
     User.delete(params[:id])
-
-   
-
     redirect "/"
   end
 
