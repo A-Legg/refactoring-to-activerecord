@@ -83,7 +83,8 @@ class App < Sinatra::Application
   end
 
   get "/fish/:id" do
-    fish = @database_connection.sql("SELECT * FROM fish WHERE id = #{params[:id]}").first
+    # fish = @database_connection.sql("SELECT * FROM fish WHERE id = #{params[:id]}").first
+    fish = Fish.find(params[:id])
     erb :"fish/show", locals: {fish: fish}
   end
 
@@ -173,7 +174,7 @@ class App < Sinatra::Application
   end
 
   def username_available?(username)
-    existing_users = @database_connection.sql("SELECT * FROM users where username = '#{username}'")
+        existing_users = @database_connection.sql("SELECT * FROM users where username = '#{username}'")
 
     existing_users.length == 0
   end
